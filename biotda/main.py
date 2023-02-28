@@ -1,11 +1,15 @@
-
-import mapper_pipline
-import preprocessing
+import pandas as pd
+import numpy as np
+import biotda.mapper_pipline as mapper_pipline
+import biotda.preprocessing as preprocessing
 import json
 import scipy
-import PH_pipline
+import biotda.ph_pipline as ph_pipline
 import warnings
-
+import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+import glob
 
 def fxn():
     warnings.warn("deprecated", RuntimeWarning)
@@ -14,6 +18,16 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     fxn()
 
+def res_scrap(folder_name):
+    sign=[]
+    for f in glob.glob(folder_name+'*.json'):
+        if 'esult' in f:
+            with open(f, 'r') as of:
+                res=json.load(of)
+                for cl in res.keys():
+                    sign=sign+list(res[cl].keys())
+    sign=np.unique(sign)
+    return sign
 
 def run(d_merged, D, N, p, covariates_columns,
         folder_name, fix_batch_effect=False, batch_column=None,
@@ -27,6 +41,12 @@ def run(d_merged, D, N, p, covariates_columns,
         n_s2=None,
         overlap_l=10, num_groups=0,
         PH=False, test_only_most_variable_gens=True, sign=[]):
+
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+
+
+
     if fix_batch_effect:
         d_merged_new=preprocessing.batch_effect(d_merged, covariates_columns, p, batch_column)
 
@@ -134,9 +154,10 @@ def run(d_merged, D, N, p, covariates_columns,
         print(filter_f)
         if PH:
             print('PH pipline')
-            PH_pipline.cycles(n_cubes, perc_overlap, X, target, t0, filter_f, folder_name, test_only_most_variable_gens)
+            ph_pipline.cycles(n_cubes, perc_overlap, X, target, t0, filter_f, folder_name, test_only_most_variable_gens)
     if PH:
         #print(p)
+        if len(sign) == 0: res_scrap(folder_name)
         X = pd.concat([d_merged.loc[D[:n_s1], p],
                        d_merged.loc[N[:n_s2], p]]).dropna().astype('float')
-        PH_pipline.PL(X, p, folder_name, sign)
+        ph_pipline.PL(X, p, folder_name, sign)

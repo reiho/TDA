@@ -1,13 +1,17 @@
+
 import gudhi.representations
+import numpy as np
+import pandas as pd
 import kmapper as km
 from biotda.mapper_pipline import clusterization_results, clustering, distance
 import networkx as nx
-import matplotlib.pyplot as plt
 from tqdm import tqdm_notebook as tqdm
 from gtda.homology import VietorisRipsPersistence
 from gtda.diagrams import PersistenceLandscape
 import cv2
 import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 plt.style.use('seaborn-whitegrid')
 sns.set_style('whitegrid')

@@ -1,4 +1,6 @@
 # Import the class
+import numpy as np
+import pandas as pd
 from itertools import combinations
 import kmapper as km
 import matplotlib as mpl
